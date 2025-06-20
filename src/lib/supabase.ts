@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Declare supabase variable at top level
+let supabase: any;
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Missing Supabase environment variables. Some features may not work.');
   // Create a mock client for development
@@ -37,11 +40,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
     }
   };
   
-  // @ts-ignore
-  export const supabase = mockClient;
+  supabase = mockClient;
 } else {
   // Create Supabase client with security options
-  export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -57,6 +59,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
     }
   });
 }
+
+// Export at top level
+export { supabase };
 
 // Helper function to check connection
 export const testConnection = async () => {
