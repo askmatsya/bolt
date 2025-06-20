@@ -3,11 +3,13 @@ import { AdminLayout } from '../components/AdminLayout';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { OrderManagement } from '../components/admin/OrderManagement';
 import { InventoryManagement } from '../components/admin/InventoryManagement';
+import { CategoryManagement } from '../components/admin/CategoryManagement';
+import { ArtisanManagement } from '../components/admin/ArtisanManagement';
 import { BarChart3, Database, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import { populateSampleData } from '../services/sampleData';
 
 export default function AdminPage() {
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'orders' | 'inventory' | 'analytics'>('dashboard');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'orders' | 'inventory' | 'categories' | 'artisans' | 'analytics'>('dashboard');
   const [isPopulating, setIsPopulating] = useState(false);
   const [populationResult, setPopulationResult] = useState<any>(null);
 
@@ -94,13 +96,17 @@ export default function AdminPage() {
               </div>
             </div>
             
-            <AdminDashboard />
+            <AdminDashboard onNavigate={setCurrentPage} />
           </div>
         );
       case 'orders':
         return <OrderManagement />;
       case 'inventory':
         return <InventoryManagement />;
+      case 'categories':
+        return <CategoryManagement />;
+      case 'artisans':
+        return <ArtisanManagement />;
       case 'analytics':
         return (
           <div className="bg-white rounded-lg p-8 shadow-sm text-center">

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ProductEditModal } from './ProductEditModal';
+import { AddProductModal } from './AddProductModal';
 
 interface Product {
   id: string;
@@ -41,15 +42,23 @@ interface Category {
   slug: string;
 }
 
+interface Artisan {
+  id: string;
+  name: string;
+  location: string;
+}
+
 export const InventoryManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showActiveOnly, setShowActiveOnly] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -86,8 +95,20 @@ export const InventoryManagement: React.FC = () => {
         console.error('Categories error:', categoriesError);
       }
 
+      // Load artisans
+      const { data: artisansData, error: artisansError } = await supabase
+        .from('artisans')
+        .select('id, name, location')
+        .eq('is_active', true)
+        .eq('verification_status', 'verified')
+        .order('name');
+
+      if (artisansError) {
+        console.error('Artisans error:', artisansError);
+      }
       setProducts(productsData || []);
       setCategories(categoriesData || []);
+      setArtisans(artisansData || []);
     } catch (error) {
       console.error('Error loading data:', error);
       setError('Failed to load inventory data. Please check your database connection.');
@@ -128,6 +149,11 @@ export const InventoryManagement: React.FC = () => {
       product.id === updatedProduct.id ? updatedProduct : product
     ));
     setEditingProduct(null);
+  };
+
+  const handleProductAdd = (newProduct: Product) => {
+    setProducts([newProduct, ...products]);
+    setShowAddModal(false);
   };
 
   const filteredProducts = products.filter(product => {
@@ -190,6 +216,13 @@ export const InventoryManagement: React.FC = () => {
             >
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 font-medium flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Product</span>
             </button>
           </div>
         </div>
@@ -395,6 +428,15 @@ export const InventoryManagement: React.FC = () => {
         isOpen={!!editingProduct}
         onClose={() => setEditingProduct(null)}
         onSave={handleProductSave}
+      />
+
+      {/* Add Product Modal */}
+      <AddProductModal
+        categories={categories}
+        artisans={artisans}
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleProductAdd}
       />
     </div>
   );

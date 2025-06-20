@@ -12,6 +12,10 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
+interface AdminDashboardProps {
+  onNavigate?: (page: string) => void;
+}
+
 interface DashboardStats {
   totalOrders: number;
   pendingOrders: number;
@@ -22,7 +26,7 @@ interface DashboardStats {
   topProducts: any[];
 }
 
-export const AdminDashboard: React.FC = () => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     pendingOrders: 0,
@@ -252,7 +256,10 @@ export const AdminDashboard: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           
           <div className="space-y-3">
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 text-left transition-colors">
+            <button 
+              onClick={() => onNavigate?.('inventory')}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 text-left transition-colors"
+            >
               <div className="flex items-center">
                 <Plus className="w-5 h-5 mr-3" />
                 <div>
@@ -262,7 +269,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </button>
             
-            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-4 text-left transition-colors">
+            <button 
+              onClick={() => onNavigate?.('orders')}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-4 text-left transition-colors"
+            >
               <div className="flex items-center">
                 <ShoppingCart className="w-5 h-5 mr-3" />
                 <div>
@@ -272,7 +282,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </button>
             
-            <button className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg p-4 text-left transition-colors">
+            <button 
+              onClick={() => onNavigate?.('analytics')}
+              className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg p-4 text-left transition-colors"
+            >
               <div className="flex items-center">
                 <TrendingUp className="w-5 h-5 mr-3" />
                 <div>

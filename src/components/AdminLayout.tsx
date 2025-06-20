@@ -9,13 +9,15 @@ import {
   X,
   LogOut,
   Home,
-  ArrowLeft
+  ArrowLeft,
+  Tag,
+  Users
 } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
-  currentPage: 'dashboard' | 'orders' | 'inventory' | 'analytics';
-  onPageChange: (page: 'dashboard' | 'orders' | 'inventory' | 'analytics') => void;
+  currentPage: 'dashboard' | 'orders' | 'inventory' | 'categories' | 'artisans' | 'analytics';
+  onPageChange: (page: 'dashboard' | 'orders' | 'inventory' | 'categories' | 'artisans' | 'analytics') => void;
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
@@ -29,6 +31,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'inventory', label: 'Products', icon: Package },
+    { id: 'categories', label: 'Categories', icon: Tag },
+    { id: 'artisans', label: 'Artisans', icon: Users },
     { id: 'analytics', label: 'Reports', icon: BarChart3 },
   ];
 
