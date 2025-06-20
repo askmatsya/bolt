@@ -206,26 +206,12 @@ export const sampleOrders = [
   }
 ];
 
-// Create a service role client for admin operations
-const createServiceClient = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-  
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('Missing Supabase service role credentials for admin operations');
-  }
-  
-  // For demo purposes, we'll use a different approach
-  return supabase;
-};
-
 export const populateSampleData = async () => {
   try {
     console.log('Starting to populate sample data...');
 
-    // First, try to disable RLS temporarily for data insertion
-    // This is for demo purposes only - in production, use proper service role key
-    const serviceClient = createServiceClient();
+    // Use regular supabase client since RLS policies allow anonymous insertions for demo
+    const serviceClient = supabase;
 
     // Insert categories first (with conflict resolution)
     console.log('Inserting categories...');
