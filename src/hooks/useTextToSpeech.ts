@@ -70,7 +70,6 @@ export const useTextToSpeech = (): TextToSpeechHook => {
     newUtterance.lang = language === 'ta' ? 'ta-IN' : 'en-IN';
 
     // Try to find a suitable voice
-    const voices = window.speechSynthesis.getVoices();
     const preferredVoice = voices.find(voice => 
       voice.lang.startsWith(language === 'ta' ? 'ta' : 'en') && 
       voice.lang.includes('IN')
