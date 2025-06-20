@@ -13,6 +13,16 @@ export default function AdminPage() {
   const [isPopulating, setIsPopulating] = useState(false);
   const [populationResult, setPopulationResult] = useState<any>(null);
 
+  // Function to communicate cache refresh to main app
+  const handleVoiceCacheRefresh = () => {
+    // Post message to parent window (main app) to refresh voice cache
+    if (window.opener) {
+      window.opener.postMessage({ type: 'REFRESH_VOICE_CACHE' }, '*');
+    }
+    
+    // If not opened in popup, try direct refresh via localStorage event
+    localStorage.setItem('voiceCacheRefresh', Date.now().toString());
+  };
   const handlePopulateSampleData = async () => {
     setIsPopulating(true);
     setPopulationResult(null);
@@ -20,6 +30,11 @@ export default function AdminPage() {
     try {
       const result = await populateSampleData();
       setPopulationResult(result);
+      
+      // Refresh voice cache after populating sample data
+      if (result.success) {
+        handleVoiceCacheRefresh();
+      }
     } catch (error) {
       setPopulationResult({ success: false, error });
     } finally {
@@ -102,7 +117,7 @@ export default function AdminPage() {
       case 'orders':
         return <OrderManagement />;
       case 'inventory':
-        return <InventoryManagement />;
+        return <InventoryManagement onVoiceCacheRefresh={handleVoiceCacheRefresh} />;
       case 'categories':
         return <CategoryManagement />;
       case 'artisans':

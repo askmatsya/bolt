@@ -21,6 +21,7 @@ interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newProduct: any) => void;
+  onVoiceCacheRefresh?: () => void;
 }
 
 export const AddProductModal: React.FC<AddProductModalProps> = ({
@@ -28,7 +29,8 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
   artisans,
   isOpen,
   onClose,
-  onSave
+  onSave,
+  onVoiceCacheRefresh
 }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -107,6 +109,12 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
       });
 
       onSave(data);
+
+      // Refresh voice search cache immediately
+      if (onVoiceCacheRefresh) {
+        onVoiceCacheRefresh();
+      }
+
       onClose();
     } catch (error) {
       console.error('Error creating product:', error);

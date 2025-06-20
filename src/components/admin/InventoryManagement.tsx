@@ -46,9 +46,12 @@ interface Artisan {
   id: string;
   name: string;
   location: string;
+  onVoiceCacheRefresh?: () => void;
 }
 
-export const InventoryManagement: React.FC = () => {
+export const InventoryManagement: React.FC<{ onVoiceCacheRefresh?: () => void }> = ({ 
+  onVoiceCacheRefresh 
+}) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [artisans, setArtisans] = useState<Artisan[]>([]);
@@ -136,6 +139,11 @@ export const InventoryManagement: React.FC = () => {
           ? { ...product, is_active: !currentStatus }
           : product
       ));
+
+      // Refresh voice search cache when product status changes
+      if (onVoiceCacheRefresh) {
+        onVoiceCacheRefresh();
+      }
     } catch (error) {
       console.error('Error toggling product status:', error);
       alert('Failed to update product status. Please try again.');
@@ -149,6 +157,11 @@ export const InventoryManagement: React.FC = () => {
       product.id === updatedProduct.id ? updatedProduct : product
     ));
     setEditingProduct(null);
+
+    // Refresh voice search cache when product is updated
+    if (onVoiceCacheRefresh) {
+      onVoiceCacheRefresh();
+    }
   };
 
   const handleProductAdd = (newProduct: Product) => {
@@ -158,8 +171,10 @@ export const InventoryManagement: React.FC = () => {
     // Notify that new product was added (this could trigger a refresh in voice search)
     console.log('New product added to inventory:', newProduct.name);
     
-    // You could also emit an event here or call a refresh function
-    // to immediately update the voice search cache
+    // Refresh voice search cache immediately
+    if (onVoiceCacheRefresh) {
+      onVoiceCacheRefresh();
+    }
   };
 
   const filteredProducts = products.filter(product => {
@@ -443,6 +458,7 @@ export const InventoryManagement: React.FC = () => {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSave={handleProductAdd}
+        onVoiceCacheRefresh={onVoiceCacheRefresh}
       />
     </div>
   );

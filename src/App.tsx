@@ -25,9 +25,18 @@ function App() {
   const [language, setLanguage] = useState<'en' | 'ta'>('en');
   const [sessionId] = useState(() => generateSessionId());
 
-  const ai = new AIMatsya();
+  const [ai] = useState(() => new AIMatsya());
   const { speak, isSpeaking, stop: stopSpeaking } = useTextToSpeech();
 
+  // Function to refresh AI product cache
+  const refreshVoiceSearchCache = useCallback(async () => {
+    try {
+      await ai.refreshProducts();
+      console.log('Voice search cache refreshed with latest products');
+    } catch (error) {
+      console.error('Failed to refresh voice search cache:', error);
+    }
+  }, [ai]);
   // Update voice state based on TTS
   useEffect(() => {
     setVoiceState(prev => ({ ...prev, isSpeaking }));
@@ -63,7 +72,10 @@ What specific item are you looking for?`,
       type: 'text'
     };
     setConversations([welcomeMessage]);
-  }, [language]);
+
+    // Refresh AI cache on app load to get latest products
+    refreshVoiceSearchCache();
+  }, [language, refreshVoiceSearchCache]);
 
   const handleVoiceToggle = async () => {
     // This is now handled by the VoiceInterface component
@@ -223,12 +235,21 @@ What specific item are you looking for?`,
                 }
               </p>
             </div>
-            <a
-              href="/admin"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              {language === 'ta' ? 'அட்மின் பேனல்' : 'Admin Panel'}
-            </a>
+            <div className="flex space-x-2">
+              <button
+                onClick={refreshVoiceSearchCache}
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition-colors"
+                title="Refresh voice search with latest products"
+              >
+                🔄 Sync Voice
+              </button>
+              <a
+                href="/admin"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                {language === 'ta' ? 'அட்மின் பேனல்' : 'Admin Panel'}
+              </a>
+            </div>
           </div>
         </div>
 

@@ -5,20 +5,30 @@ export class AIMatsya {
   private language: 'en' | 'ta' = 'en';
   private products: Product[] = []; // Will be populated from database
   private lastFetch: number = 0;
-  private fetchCooldown: number = 30000; // 30 seconds cooldown
+  private fetchCooldown: number = 5000; // Reduced to 5 seconds for better responsiveness
 
   setLanguage(lang: 'en' | 'ta') {
     this.language = lang;
   }
 
+  // Force refresh products (bypasses cache)
+  async refreshProducts(): Promise<void> {
+    console.log('🔄 Forcing refresh of voice search product cache...');
+    this.lastFetch = 0; // Reset cache timestamp
+    await this.loadProducts();
+    console.log(`✅ Voice search cache refreshed with ${this.products.length} products`);
+  }
   // Fetch products from database with caching
   private async loadProducts(): Promise<Product[]> {
     const now = Date.now();
     
     // Use cache if recent fetch (within cooldown period)
     if (this.products.length > 0 && (now - this.lastFetch) < this.fetchCooldown) {
+      console.log(`Using cached products (${this.products.length} items)`);
       return this.products;
     }
+
+    console.log('🔍 Fetching fresh products from database...');
 
     try {
       // Fetch from database using the service
@@ -43,7 +53,7 @@ export class AIMatsya {
       }));
 
       this.lastFetch = now;
-      console.log(`Loaded ${this.products.length} products from database for voice search`);
+      console.log(`✅ Loaded ${this.products.length} products from database for voice search`);
       
       return this.products;
     } catch (error) {
@@ -52,6 +62,7 @@ export class AIMatsya {
       // Fallback to static products if database fails
       const { products: fallbackProducts } = await import('../data/products');
       this.products = fallbackProducts;
+      console.log(`⚠️ Using fallback products (${this.products.length} items)`);
       
       return this.products;
     }
@@ -277,9 +288,4 @@ export class AIMatsya {
     });
   }
 
-  // Method to force refresh products (can be called when new products are added)
-  async refreshProducts(): Promise<void> {
-    this.lastFetch = 0; // Reset cache
-    await this.loadProducts();
-  }
 }
