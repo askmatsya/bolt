@@ -154,6 +154,12 @@ export const InventoryManagement: React.FC = () => {
   const handleProductAdd = (newProduct: Product) => {
     setProducts([newProduct, ...products]);
     setShowAddModal(false);
+    
+    // Notify that new product was added (this could trigger a refresh in voice search)
+    console.log('New product added to inventory:', newProduct.name);
+    
+    // You could also emit an event here or call a refresh function
+    // to immediately update the voice search cache
   };
 
   const filteredProducts = products.filter(product => {

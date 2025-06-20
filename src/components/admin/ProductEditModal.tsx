@@ -122,6 +122,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       // Call the onSave callback with updated product
       onSave(data);
       onClose();
+      
+      // Notify that product was updated
+      console.log('Product updated in inventory:', data.name);
     } catch (error) {
       console.error('Error updating product:', error);
       setError('Failed to update product. Please try again.');

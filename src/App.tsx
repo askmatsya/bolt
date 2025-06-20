@@ -76,6 +76,9 @@ What specific item are you looking for?`,
     // Stop any current speech
     stopSpeaking();
 
+    // Refresh AI product data before processing (ensures latest products are available)
+    await ai.refreshProducts();
+    
     // Add user message
     const userMessage: Conversation = {
       id: Date.now().toString(),
