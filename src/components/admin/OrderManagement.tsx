@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Eye, 
@@ -9,7 +8,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Package
+  Package,
+  RefreshCw
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -27,7 +27,7 @@ interface Order {
     name: string;
     image_url: string;
     price_range: string;
-  };
+  } | null;
 }
 
 const statusConfig = {
@@ -42,8 +42,10 @@ const statusConfig = {
 export const OrderManagement: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -52,6 +54,8 @@ export const OrderManagement: React.FC = () => {
   const loadOrders = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('orders')
         .select(`
@@ -60,10 +64,14 @@ export const OrderManagement: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
+      
       setOrders(data || []);
     } catch (error) {
       console.error('Error loading orders:', error);
+      setError('Failed to load orders. Please check your database connection.');
     } finally {
       setLoading(false);
     }
@@ -71,9 +79,14 @@ export const OrderManagement: React.FC = () => {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
+      setUpdating(orderId);
+      
       const { error } = await supabase
         .from('orders')
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', orderId);
 
       if (error) throw error;
@@ -88,6 +101,9 @@ export const OrderManagement: React.FC = () => {
       }
     } catch (error) {
       console.error('Error updating order status:', error);
+      alert('Failed to update order status. Please try again.');
+    } finally {
+      setUpdating(null);
     }
   };
 
@@ -116,11 +132,39 @@ export const OrderManagement: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <div className="flex items-center mb-4">
+          <AlertCircle className="w-6 h-6 text-red-600 mr-2" />
+          <h3 className="text-lg font-semibold text-red-800">Orders Error</h3>
+        </div>
+        <p className="text-red-700 mb-4">{error}</p>
+        <button
+          onClick={loadOrders}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          <span>Retry</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Order Management</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Order Management</h2>
+          <button
+            onClick={loadOrders}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+        </div>
         
         {/* Status Filter Pills */}
         <div className="flex flex-wrap gap-2">
@@ -148,57 +192,75 @@ export const OrderManagement: React.FC = () => {
       </div>
 
       {/* Orders List */}
-      <div className="space-y-4">
-        {filteredOrders.map((order) => {
-          const StatusIcon = statusConfig[order.status].icon;
-          
-          return (
-            <div key={order.id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-              {/* Order Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${statusConfig[order.status].color}`}></div>
-                  <span className="font-semibold text-gray-900">#{order.id.slice(-8)}</span>
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium text-white ${statusConfig[order.status].color}`}>
-                    <StatusIcon className="w-3 h-3" />
-                    <span>{statusConfig[order.status].label}</span>
+      {filteredOrders.length === 0 ? (
+        <div className="bg-white rounded-lg p-12 text-center">
+          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            {statusFilter === 'all' ? 'No orders yet' : `No ${statusFilter} orders`}
+          </h3>
+          <p className="text-gray-600">
+            {statusFilter === 'all' 
+              ? 'Orders will appear here once customers start placing them.' 
+              : `No orders with status "${statusFilter}" found.`
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredOrders.map((order) => {
+            const StatusIcon = statusConfig[order.status].icon;
+            
+            return (
+              <div key={order.id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                {/* Order Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-3 h-3 rounded-full ${statusConfig[order.status].color}`}></div>
+                    <span className="font-semibold text-gray-900">#{order.id.slice(-8)}</span>
+                    <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium text-white ${statusConfig[order.status].color}`}>
+                      <StatusIcon className="w-3 h-3" />
+                      <span>{statusConfig[order.status].label}</span>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => setSelectedOrder(order)}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    <Eye className="w-4 h-4 inline mr-1" />
+                    View Details
+                  </button>
+                </div>
+
+                {/* Order Info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-1">Customer</h4>
+                    <p className="text-gray-600">{order.customer_name}</p>
+                    <p className="text-gray-600">{order.customer_phone}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-1">Product</h4>
+                    <p className="text-gray-600">{order.products?.name || 'Product not found'}</p>
+                    <p className="text-orange-600 font-medium">{order.products?.price_range || 'Price not available'}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-1">Order Date</h4>
+                    <p className="text-gray-600">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      {new Date(order.created_at).toLocaleTimeString()}
+                    </p>
                   </div>
                 </div>
-                
-                <button
-                  onClick={() => setSelectedOrder(order)}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  <Eye className="w-4 h-4 inline mr-1" />
-                  View
-                </button>
               </div>
-
-              {/* Order Info */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-1">Customer</h4>
-                  <p className="text-gray-600">{order.customer_name}</p>
-                  <p className="text-gray-600">{order.customer_phone}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-1">Product</h4>
-                  <p className="text-gray-600">{order.products.name}</p>
-                  <p className="text-orange-600 font-medium">{order.products.price_range}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-1">Order Date</h4>
-                  <p className="text-gray-600">
-                    {new Date(order.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Order Detail Modal */}
       {selectedOrder && (
@@ -220,14 +282,20 @@ export const OrderManagement: React.FC = () => {
               {/* Product Image and Info */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="flex items-center space-x-4">
-                  <img 
-                    src={selectedOrder.products.image_url} 
-                    alt={selectedOrder.products.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
+                  {selectedOrder.products?.image_url ? (
+                    <img 
+                      src={selectedOrder.products.image_url} 
+                      alt={selectedOrder.products?.name || 'Product'}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <Package className="w-8 h-8 text-gray-400" />
+                    </div>
+                  )}
                   <div>
-                    <h4 className="font-semibold text-gray-900">{selectedOrder.products.name}</h4>
-                    <p className="text-orange-600 font-medium">{selectedOrder.products.price_range}</p>
+                    <h4 className="font-semibold text-gray-900">{selectedOrder.products?.name || 'Product not found'}</h4>
+                    <p className="text-orange-600 font-medium">{selectedOrder.products?.price_range || 'Price not available'}</p>
                   </div>
                 </div>
               </div>
@@ -289,13 +357,14 @@ export const OrderManagement: React.FC = () => {
                   {Object.entries(statusConfig).map(([status, config]) => {
                     const StatusIcon = config.icon;
                     const isCurrentStatus = selectedOrder.status === status;
+                    const isUpdating = updating === selectedOrder.id;
                     
                     return (
                       <button
                         key={status}
                         onClick={() => updateOrderStatus(selectedOrder.id, status)}
-                        disabled={isCurrentStatus}
-                        className={`p-3 rounded-lg text-sm font-medium transition-colors ${
+                        disabled={isCurrentStatus || isUpdating}
+                        className={`p-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           isCurrentStatus
                             ? `${config.color} text-white`
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -303,6 +372,7 @@ export const OrderManagement: React.FC = () => {
                       >
                         <StatusIcon className="w-4 h-4 inline mr-2" />
                         {config.label}
+                        {isUpdating && <span className="ml-2">...</span>}
                       </button>
                     );
                   })}

@@ -1,32 +1,62 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../types/database';
 
 // Environment variables validation
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Please check your .env file.'
-  );
-}
-
-// Create Supabase client with security options
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  },
-  db: {
-    schema: 'public'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'askmatsya-voice-bot'
+  console.warn('Missing Supabase environment variables. Some features may not work.');
+  // Create a mock client for development
+  const mockClient = {
+    from: () => ({
+      select: () => ({ 
+        eq: () => ({ 
+          order: () => ({ 
+            data: [], 
+            error: new Error('Supabase not configured') 
+          }) 
+        })
+      }),
+      insert: () => ({ 
+        select: () => ({ 
+          single: () => ({ 
+            data: null, 
+            error: new Error('Supabase not configured') 
+          }) 
+        })
+      }),
+      update: () => ({ 
+        eq: () => ({ 
+          data: null, 
+          error: new Error('Supabase not configured') 
+        })
+      })
+    }),
+    auth: {
+      getUser: () => ({ data: { user: null }, error: null })
     }
-  }
-});
+  };
+  
+  // @ts-ignore
+  export const supabase = mockClient;
+} else {
+  // Create Supabase client with security options
+  export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    },
+    db: {
+      schema: 'public'
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'askmatsya-voice-bot'
+      }
+    }
+  });
+}
 
 // Helper function to check connection
 export const testConnection = async () => {

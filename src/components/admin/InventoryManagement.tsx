@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
@@ -9,7 +8,9 @@ import {
   Package,
   DollarSign,
   MapPin,
-  Tag
+  Tag,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -26,11 +27,11 @@ interface Product {
   categories: {
     name: string;
     slug: string;
-  };
+  } | null;
   artisans?: {
     name: string;
     location: string;
-  };
+  } | null;
 }
 
 interface Category {
@@ -43,11 +44,13 @@ export const InventoryManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showActiveOnly, setShowActiveOnly] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -56,6 +59,7 @@ export const InventoryManagement: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       
       // Load products
       const { data: productsData, error: productsError } = await supabase
@@ -67,7 +71,9 @@ export const InventoryManagement: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (productsError) throw productsError;
+      if (productsError) {
+        console.error('Products error:', productsError);
+      }
 
       // Load categories
       const { data: categoriesData, error: categoriesError } = await supabase
@@ -76,12 +82,15 @@ export const InventoryManagement: React.FC = () => {
         .eq('is_active', true)
         .order('name');
 
-      if (categoriesError) throw categoriesError;
+      if (categoriesError) {
+        console.error('Categories error:', categoriesError);
+      }
 
       setProducts(productsData || []);
       setCategories(categoriesData || []);
     } catch (error) {
       console.error('Error loading data:', error);
+      setError('Failed to load inventory data. Please check your database connection.');
     } finally {
       setLoading(false);
     }
@@ -89,9 +98,14 @@ export const InventoryManagement: React.FC = () => {
 
   const toggleProductStatus = async (productId: string, currentStatus: boolean) => {
     try {
+      setUpdating(productId);
+      
       const { error } = await supabase
         .from('products')
-        .update({ is_active: !currentStatus })
+        .update({ 
+          is_active: !currentStatus,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', productId);
 
       if (error) throw error;
@@ -103,13 +117,16 @@ export const InventoryManagement: React.FC = () => {
       ));
     } catch (error) {
       console.error('Error toggling product status:', error);
+      alert('Failed to update product status. Please try again.');
+    } finally {
+      setUpdating(null);
     }
   };
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.categories.slug === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || product.categories?.slug === selectedCategory;
     const matchesStatus = !showActiveOnly || product.is_active;
 
     return matchesSearch && matchesCategory && matchesStatus;
@@ -134,19 +151,47 @@ export const InventoryManagement: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <div className="flex items-center mb-4">
+          <AlertCircle className="w-6 h-6 text-red-600 mr-2" />
+          <h3 className="text-lg font-semibold text-red-800">Inventory Error</h3>
+        </div>
+        <p className="text-red-700 mb-4">{error}</p>
+        <button
+          onClick={loadData}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          <span>Retry</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Product Management</h2>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 font-medium flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Product</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={loadData}
+              className="bg-gray-500 hover:bg-gray-600 text-white rounded-lg px-4 py-2 font-medium flex items-center space-x-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Refresh</span>
+            </button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 font-medium flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Product</span>
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -234,103 +279,138 @@ export const InventoryManagement: React.FC = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            {/* Product Image */}
-            <div className="relative">
-              <img 
-                src={product.image_url} 
-                alt={product.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="absolute top-3 right-3">
-                <button
-                  onClick={() => toggleProductStatus(product.id, product.is_active)}
-                  className={`p-2 rounded-full shadow-md ${
-                    product.is_active
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-500 text-white'
-                  }`}
-                >
-                  {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </button>
-              </div>
-              <div className="absolute bottom-3 left-3">
-                <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                  {product.categories.name}
-                </span>
-              </div>
-            </div>
-
-            {/* Product Info */}
-            <div className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <DollarSign className="w-4 h-4 mr-1 text-orange-500" />
-                  <span className="font-medium text-orange-600">{product.price_range}</span>
-                </div>
-                
-                <div className="flex items-center text-sm text-gray-600">
-                  <MapPin className="w-4 h-4 mr-1 text-orange-500" />
-                  <span>{product.origin}</span>
-                </div>
-                
-                {product.artisans && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Package className="w-4 h-4 mr-1 text-orange-500" />
-                    <span>{product.artisans.name}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1 mb-4">
-                {product.tags.slice(0, 3).map((tag) => (
-                  <span key={tag} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                    {tag}
-                  </span>
-                ))}
-                {product.tags.length > 3 && (
-                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                    +{product.tags.length - 3}
-                  </span>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setEditingProduct(product)}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-2 px-3 text-sm font-medium"
-                >
-                  <Edit className="w-4 h-4 inline mr-1" />
-                  Edit
-                </button>
-                <button
-                  onClick={() => toggleProductStatus(product.id, product.is_active)}
-                  className={`flex-1 rounded-lg py-2 px-3 text-sm font-medium ${
-                    product.is_active
-                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      : 'bg-green-500 text-white hover:bg-green-600'
-                  }`}
-                >
-                  {product.is_active ? 'Hide' : 'Show'}
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
+      {filteredProducts.length === 0 ? (
+        <div className="bg-white rounded-lg p-12 text-center">
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+          <p className="text-gray-600">
+            {searchTerm || selectedCategory !== 'all' || !showActiveOnly
+              ? 'Try adjusting your search or filter criteria'
+              : 'Add your first product to get started'
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              {/* Product Image */}
+              <div className="relative">
+                <img 
+                  src={product.image_url} 
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg';
+                  }}
+                />
+                <div className="absolute top-3 right-3">
+                  <button
+                    onClick={() => toggleProductStatus(product.id, product.is_active)}
+                    disabled={updating === product.id}
+                    className={`p-2 rounded-full shadow-md transition-colors disabled:opacity-50 ${
+                      product.is_active
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-500 text-white'
+                    }`}
+                  >
+                    {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="absolute bottom-3 left-3">
+                  <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                    {product.categories?.name || 'Uncategorized'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Product Info */}
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <DollarSign className="w-4 h-4 mr-1 text-orange-500" />
+                    <span className="font-medium text-orange-600">{product.price_range}</span>
+                  </div>
+                  
+                  <div className="flex items-center text-sm text-gray-600">
+                    <MapPin className="w-4 h-4 mr-1 text-orange-500" />
+                    <span>{product.origin}</span>
+                  </div>
+                  
+                  {product.artisans && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Package className="w-4 h-4 mr-1 text-orange-500" />
+                      <span>{product.artisans.name}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {product.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+                      {tag}
+                    </span>
+                  ))}
+                  {product.tags.length > 3 && (
+                    <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+                      +{product.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setEditingProduct(product)}
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-2 px-3 text-sm font-medium"
+                  >
+                    <Edit className="w-4 h-4 inline mr-1" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => toggleProductStatus(product.id, product.is_active)}
+                    disabled={updating === product.id}
+                    className={`flex-1 rounded-lg py-2 px-3 text-sm font-medium disabled:opacity-50 ${
+                      product.is_active
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        : 'bg-green-500 text-white hover:bg-green-600'
+                    }`}
+                  >
+                    {product.is_active ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Coming Soon Modal for Add/Edit */}
+      {(showAddForm || editingProduct) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="text-center">
+              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {showAddForm ? 'Add Product' : 'Edit Product'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Product management features are coming soon. For now, you can view and toggle product visibility.
+              </p>
+              <button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setEditingProduct(null);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
