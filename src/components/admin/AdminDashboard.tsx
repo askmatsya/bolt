@@ -1,4 +1,3 @@
-'use client';
 
 import React, { useState, useEffect } from 'react';
 import { 
@@ -9,9 +8,10 @@ import {
   Clock,
   CheckCircle,
   AlertTriangle,
-  DollarSign
+  DollarSign,
+  Plus
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 interface DashboardStats {
   totalOrders: number;

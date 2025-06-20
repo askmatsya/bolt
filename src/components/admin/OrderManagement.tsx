@@ -1,4 +1,3 @@
-'use client';
 
 import React, { useState, useEffect } from 'react';
 import { 
@@ -12,7 +11,7 @@ import {
   AlertCircle,
   Package
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 interface Order {
   id: string;

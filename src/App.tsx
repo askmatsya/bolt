@@ -206,6 +206,29 @@ What specific item are you looking for?`,
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Quick Admin Access for Testing */}
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-blue-800">
+                {language === 'ta' ? 'டெவலப்பர் அணுகல்' : 'Developer Access'}
+              </h3>
+              <p className="text-xs text-blue-600 mt-1">
+                {language === 'ta' 
+                  ? 'ஆர்டர்களையும் இன்வென்டரியையும் நிர்வகிக்க அட்மின் பேனலை அணுகவும்'
+                  : 'Access admin panel to manage orders and inventory'
+                }
+              </p>
+            </div>
+            <a
+              href="/admin"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              {language === 'ta' ? 'அட்மின் பேனல்' : 'Admin Panel'}
+            </a>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Voice Interface */}
           <div className="lg:col-span-1">

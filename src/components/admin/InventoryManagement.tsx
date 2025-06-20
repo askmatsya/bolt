@@ -1,4 +1,3 @@
-'use client';
 
 import React, { useState, useEffect } from 'react';
 import { 
@@ -12,7 +11,7 @@ import {
   MapPin,
   Tag
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 interface Product {
   id: string;

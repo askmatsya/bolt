@@ -1,10 +1,9 @@
-'use client';
 
 import React, { useState } from 'react';
-import { AdminLayout } from '@/components/AdminLayout';
-import { AdminDashboard } from '@/components/admin/AdminDashboard';
-import { OrderManagement } from '@/components/admin/OrderManagement';
-import { InventoryManagement } from '@/components/admin/InventoryManagement';
+import { AdminLayout } from '../components/AdminLayout';
+import { AdminDashboard } from '../components/admin/AdminDashboard';
+import { OrderManagement } from '../components/admin/OrderManagement';
+import { InventoryManagement } from '../components/admin/InventoryManagement';
 import { BarChart3 } from 'lucide-react';
 
 export default function AdminPage() {

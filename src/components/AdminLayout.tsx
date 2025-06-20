@@ -1,4 +1,3 @@
-'use client';
 
 import React, { useState } from 'react';
 import { 
@@ -9,7 +8,8 @@ import {
   Menu, 
   X,
   LogOut,
-  Home
+  Home,
+  ArrowLeft
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -41,7 +41,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Mobile Header */}
       <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">AskMatsya Admin</h1>
+          <div className="flex items-center space-x-3">
+            <a 
+              href="/" 
+              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              title="Back to Main App"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </a>
+            <h1 className="text-xl font-bold text-gray-900">AskMatsya Admin</h1>
+          </div>
           <button
             onClick={toggleMobileMenu}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
@@ -85,7 +94,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         {/* Desktop Sidebar */}
         <div className="hidden lg:block w-64 bg-white shadow-sm h-screen sticky top-0">
           <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-8">AskMatsya Admin</h1>
+            <div className="flex items-center space-x-3 mb-8">
+              <a 
+                href="/" 
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                title="Back to Main App"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </a>
+              <h1 className="text-2xl font-bold text-gray-900">AskMatsya Admin</h1>
+            </div>
             
             <nav className="space-y-2">
               {menuItems.map((item) => {
