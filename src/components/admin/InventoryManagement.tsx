@@ -364,7 +364,7 @@ export const InventoryManagement: React.FC = () => {
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-gray-600">
                     <DollarSign className="w-4 h-4 mr-1 text-orange-500" />
-                    <span className="font-medium text-orange-600">{product.price_range}</span>
+                    <span className="font-medium text-orange-600">{product.price_range.replace('₹', '$')}</span>
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-600">

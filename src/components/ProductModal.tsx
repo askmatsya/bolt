@@ -38,7 +38,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h2>
-              <p className="text-2xl font-bold text-orange-600">{product.priceRange}</p>
+              <p className="text-2xl font-bold text-orange-600">{product.priceRange.replace('₹', '$')}</p>
             </div>
             <button className="bg-orange-50 p-3 rounded-full hover:bg-orange-100 transition-colors">
               <Heart className="w-6 h-6 text-orange-600" />

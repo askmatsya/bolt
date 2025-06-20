@@ -13,7 +13,7 @@ export class AIMatsya {
     const responses = {
       en: {
         wedding: `Namaste! For weddings, I recommend these exquisite pieces that will make the occasion truly special. Banarasi sarees are perfect for brides, while Kundan jewelry adds royal elegance. Each piece carries centuries of tradition and craftsmanship.`,
-        budget: `I've found some excellent options within your ₹${params?.budget} budget. All these products are authentic and come directly from artisans.`,
+        budget: `I've found some excellent options within your $${params?.budget} budget. All these products are authentic and come directly from artisans.`,
         saree: `Saree - the pride of Indian women! Our collection features authentic handwoven sarees from different regions. Each saree tells a story of tradition, artistry, and cultural heritage.`,
         jewelry: `Traditional Indian jewelry is not just adornment - it's a symbol of prosperity and cultural identity. Our Kundan and traditional pieces are crafted by master artisans using time-honored techniques.`,
         cultural: `Let me tell you about ${params?.productName}! ${params?.significance}\n\nThis beautiful tradition has been passed down through generations, and each piece we offer maintains these authentic practices.`,
@@ -23,7 +23,7 @@ export class AIMatsya {
       },
       ta: {
         wedding: `வணக்கம்! திருமணங்களுக்கு, இந்த அழகான பொருட்களை நான் பரிந்துரைக்கிறேன், அவை இந்த நிகழ்வை உண்மையிலேயே சிறப்பாக்கும். பனாரசி புடவைகள் மணப்பெண்களுக்கு சரியானவை, அதே நேரத்தில் குந்தன் நகைகள் அரச நேர்த்தியை சேர்க்கின்றன. ஒவ்வொரு பொருளும் நூற்றாண்டுகளின் பாரம்பரியத்தையும் கைவினைத்திறனையும் கொண்டுள்ளது.`,
-        budget: `உங்கள் ₹${params?.budget} பட்ஜெட்டுக்குள் சில சிறந்த விருப்பங்களை நான் கண்டுபிடித்துள்ளேன். இந்த அனைத்து பொருட்களும் உண்மையானவை மற்றும் நேரடியாக கைவினைஞர்களிடமிருந்து வருகின்றன.`,
+        budget: `உங்கள் $${params?.budget} பட்ஜெட்டுக்குள் சில சிறந்த விருப்பங்களை நான் கண்டுபிடித்துள்ளேன். இந்த அனைத்து பொருட்களும் உண்மையானவை மற்றும் நேரடியாக கைவினைஞர்களிடமிருந்து வருகின்றன.`,
         saree: `புடவை - இந்திய பெண்களின் பெருமை! எங்கள் தொகுப்பில் பல்வேறு பகுதிகளிலிருந்து உண்மையான கைத்தறி புடவைகள் உள்ளன. ஒவ்வொரு புடவையும் பாரம்பரியம், கலை மற்றும் கலாச்சார பாரம்பரியத்தின் கதையைச் சொல்கிறது.`,
         jewelry: `பாரம்பரிய இந்திய நகைகள் வெறும் அலங்காரம் அல்ல - அது செழிப்பு மற்றும் கலாச்சார அடையாளத்தின் சின்னம். எங்கள் குந்தன் மற்றும் பாரம்பரிய பொருட்கள் காலங்காலமாக கடைபிடிக்கப்படும் நுட்பங்களைப் பயன்படுத்தி தலைசிறந்த கைவினைஞர்களால் வடிவமைக்கப்பட்டுள்ளன.`,
         cultural: `${params?.productName} பற்றி நான் உங்களுக்குச் சொல்கிறேன்! ${params?.significance}\n\nஇந்த அழகான பாரம்பரியம் தலைமுறைகளாக கடத்தப்பட்டு வருகிறது, மற்றும் நாங்கள் வழங்கும் ஒவ்வொரு பொருளும் இந்த உண்மையான நடைமுறைகளை பராமரிக்கிறது.`,

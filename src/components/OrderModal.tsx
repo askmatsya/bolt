@@ -59,7 +59,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ product, isOpen, onClose
                 <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded-lg mr-4" />
                 <div>
                   <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                  <p className="text-orange-600 font-bold">{product.priceRange}</p>
+                  <p className="text-orange-600 font-bold">{product.priceRange.replace('₹', '$')}</p>
                   <p className="text-sm text-gray-600">From {product.origin}</p>
                 </div>
               </div>

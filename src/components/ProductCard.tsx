@@ -32,7 +32,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onLearnMore, 
       <div className="p-6">
         <div className="mb-3">
           <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.name}</h3>
-          <p className="text-2xl font-bold text-orange-600">{product.priceRange}</p>
+          <p className="text-2xl font-bold text-orange-600">{product.priceRange.replace('₹', '$')}</p>
         </div>
 
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>

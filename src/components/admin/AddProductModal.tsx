@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Save, Package, Plus } from 'lucide-react';
+import { X, Save, Package, Plus, Sparkles, RefreshCw } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { AIProductAssistant } from '../../services/aiProductAssistant';
 
 interface Category {
   id: string;
@@ -48,6 +49,8 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiAssistant] = useState(new AIProductAssistant());
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +120,45 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleAIGenerate = async () => {
+    if (!formData.name.trim() || !formData.category_id) {
+      alert('Please enter a product name and select a category first');
+      return;
+    }
+
+    setGeneratingAI(true);
+    
+    try {
+      // Find the selected category
+      const selectedCategory = categories.find(cat => cat.id === formData.category_id);
+      if (!selectedCategory) return;
+
+      // Generate AI suggestions
+      const suggestions = aiAssistant.generateSuggestions(formData.name, selectedCategory.slug);
+      
+      // Update form with AI suggestions
+      setFormData(prev => ({
+        ...prev,
+        description: suggestions.description,
+        cultural_significance: suggestions.culturalSignificance,
+        origin: suggestions.origin,
+        image_url: suggestions.imageUrl,
+        tags: suggestions.tags.join(', '),
+        occasions: suggestions.occasions.join(', '),
+        materials: suggestions.materials.join(', '),
+        craft_time: suggestions.craftTime,
+        price_range: suggestions.priceRange,
+        price: suggestions.suggestedPrice
+      }));
+      
+    } catch (error) {
+      console.error('AI generation error:', error);
+      alert('Failed to generate AI suggestions. Please try again.');
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -133,6 +175,33 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* AI Assistant Section */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-purple-800 mb-1">
+                  🤖 AI Product Assistant
+                </h3>
+                <p className="text-xs text-purple-700">
+                  Enter a product name and category, then let AI generate description, cultural significance, images, and more!
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAIGenerate}
+                disabled={generatingAI || !formData.name.trim() || !formData.category_id}
+                className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
+              >
+                {generatingAI ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                <span>{generatingAI ? 'Generating...' : 'Generate with AI'}</span>
+              </button>
+            </div>
+          </div>
+
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-red-700">{error}</p>
@@ -244,7 +313,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (₹) *
+                  Price (USD) *
                 </label>
                 <input
                   type="number"
@@ -252,7 +321,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                   min="0"
                   value={formData.price}
                   onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
-                  placeholder="15000"
+                  placeholder="250"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
               </div>
@@ -266,7 +335,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                   required
                   value={formData.price_range}
                   onChange={(e) => handleInputChange('price_range', e.target.value)}
-                  placeholder="₹12,000 - ₹25,000"
+                  placeholder="$180 - $420"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
               </div>
@@ -280,7 +349,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                   required
                   value={formData.image_url}
                   onChange={(e) => handleInputChange('image_url', e.target.value)}
-                  placeholder="https://images.pexels.com/photos/..."
+                  placeholder="https://images.pexels.com/photos/... (AI will suggest)"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {formData.image_url && (

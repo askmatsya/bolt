@@ -221,7 +221,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (₹) *
+                  Price (USD) *
                 </label>
                 <input
                   type="number"
@@ -235,14 +235,14 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Range *
+                  Price Range (USD) *
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.price_range}
                   onChange={(e) => handleInputChange('price_range', e.target.value)}
-                  placeholder="e.g., ₹12,000 - ₹25,000"
+                  placeholder="e.g., $180 - $420"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
               </div>

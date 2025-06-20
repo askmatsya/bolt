@@ -187,7 +187,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               <DollarSign className="w-8 h-8 text-purple-600" />
             </div>
             <div className="ml-4">
-              <h3 className="text-lg font-semibold text-gray-900">₹{stats.totalRevenue.toLocaleString()}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">${stats.totalRevenue.toLocaleString()}</h3>
               <p className="text-sm text-gray-600">Total Revenue</p>
             </div>
           </div>

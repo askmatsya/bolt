@@ -51,14 +51,14 @@ An AI-powered voice assistant that helps users discover authentic Indian ethnic 
 ## 🗣️ Voice Commands Examples
 
 **English:**
-- "Show me wedding sarees"
-- "Traditional jewelry under 10000 rupees"
+- "Show me wedding sarees"  
+- "Traditional jewelry under 200 dollars"
 - "Tell me about Madhubani art"
 - "Gift ideas for festivals"
 
 **Tamil:**
 - "எனக்கு திருமண புடவை காட்டுங்கள்"
-- "பாரம்பரிய நகைகள் 10000 ரூபாய்க்கு கீழ்"
+- "பாரம்பரிய நகைகள் 200 டாலருக்கு கீழ்"
 - "மதுபனி கலையைப் பற்றி சொல்லுங்கள்"
 
 ## 🛠️ Tech Stack
@@ -100,7 +100,7 @@ npm run build
 ## 📊 Database Schema
 
 The app uses a comprehensive database with:
-- **Products**: Name, price, cultural significance, materials
+- **Products**: Name, price (USD), cultural significance, materials
 - **Categories**: Hierarchical product organization
 - **Orders**: Customer details and order tracking
 - **Artisans**: Craftsperson profiles and locations

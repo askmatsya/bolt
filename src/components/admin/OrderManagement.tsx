@@ -243,7 +243,7 @@ export const OrderManagement: React.FC = () => {
                   <div>
                     <h4 className="font-medium text-gray-900 mb-1">Product</h4>
                     <p className="text-gray-600">{order.products?.name || 'Product not found'}</p>
-                    <p className="text-orange-600 font-medium">{order.products?.price_range || 'Price not available'}</p>
+                    <p className="text-orange-600 font-medium">{(order.products?.price_range || 'Price not available').replace('₹', '$')}</p>
                   </div>
                   
                   <div>
@@ -295,7 +295,7 @@ export const OrderManagement: React.FC = () => {
                   )}
                   <div>
                     <h4 className="font-semibold text-gray-900">{selectedOrder.products?.name || 'Product not found'}</h4>
-                    <p className="text-orange-600 font-medium">{selectedOrder.products?.price_range || 'Price not available'}</p>
+                    <p className="text-orange-600 font-medium">{(selectedOrder.products?.price_range || 'Price not available').replace('₹', '$')}</p>
                   </div>
                 </div>
               </div>
