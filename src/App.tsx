@@ -6,6 +6,8 @@ import { ProductModal } from './components/ProductModal';
 import { OrderModal } from './components/OrderModal';
 import { VoiceState, Conversation, Product } from './types';
 import { AIMatsya } from './utils/ai';
+import { useTextToSpeech } from './hooks/useTextToSpeech';
+import { generateSessionId } from './services/database';
 
 function App() {
   const [voiceState, setVoiceState] = useState<VoiceState>({
@@ -21,8 +23,15 @@ function App() {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [orderProduct, setOrderProduct] = useState<Product | null>(null);
   const [language, setLanguage] = useState<'en' | 'ta'>('en');
+  const [sessionId] = useState(() => generateSessionId());
 
   const ai = new AIMatsya();
+  const { speak, isSpeaking, stop: stopSpeaking } = useTextToSpeech();
+
+  // Update voice state based on TTS
+  useEffect(() => {
+    setVoiceState(prev => ({ ...prev, isSpeaking }));
+  }, [isSpeaking]);
 
   // Welcome message
   useEffect(() => {
@@ -57,19 +66,16 @@ What specific item are you looking for?`,
   }, [language]);
 
   const handleVoiceToggle = async () => {
-    if (voiceState.isListening) {
-      setVoiceState({ ...voiceState, isListening: false });
-    } else {
-      setVoiceState({ ...voiceState, isListening: true });
-      
-      // Simulate listening timeout
-      setTimeout(() => {
-        setVoiceState(prev => ({ ...prev, isListening: false }));
-      }, 5000);
-    }
+    // This is now handled by the VoiceInterface component
+    // Keep this for backward compatibility
   };
 
   const handleVoiceInput = async (input: string) => {
+    if (!input.trim()) return;
+
+    // Stop any current speech
+    stopSpeaking();
+
     // Add user message
     const userMessage: Conversation = {
       id: Date.now().toString(),
@@ -80,15 +86,18 @@ What specific item are you looking for?`,
     };
 
     setConversations(prev => [...prev, userMessage]);
-    setVoiceState({ ...voiceState, isProcessing: true, isListening: false });
+    setVoiceState(prev => ({ ...prev, isProcessing: true }));
 
     try {
+      // Set AI language
+      ai.setLanguage(language);
+      
       // Simulate AI processing
       await ai.simulateVoiceProcessing();
       
       const aiResponse = ai.processVoiceInput(input);
       
-      setVoiceState({ ...voiceState, isProcessing: false, isSpeaking: true });
+      setVoiceState(prev => ({ ...prev, isProcessing: false }));
 
       // Add AI response
       const aiMessage: Conversation = {
@@ -102,14 +111,26 @@ What specific item are you looking for?`,
 
       setConversations(prev => [...prev, aiMessage]);
 
-      // Simulate speaking duration
+      // Speak the response
       setTimeout(() => {
-        setVoiceState(prev => ({ ...prev, isSpeaking: false }));
-      }, 3000);
+        speak(aiResponse.response, language);
+      }, 500);
 
     } catch (error) {
-      setVoiceState({ ...voiceState, isProcessing: false });
+      setVoiceState(prev => ({ ...prev, isProcessing: false }));
       console.error('Voice processing error:', error);
+      
+      const errorMessage: Conversation = {
+        id: (Date.now() + 2).toString(),
+        message: language === 'ta' 
+          ? 'மன்னிக்கவும், ஏதோ தவறு நடந்துள்ளது. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.'
+          : 'Sorry, something went wrong. Please try again.',
+        isUser: false,
+        timestamp: new Date(),
+        type: 'text'
+      };
+      
+      setConversations(prev => [...prev, errorMessage]);
     }
   };
 
