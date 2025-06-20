@@ -13,6 +13,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { ProductEditModal } from './ProductEditModal';
 
 interface Product {
   id: string;
@@ -49,7 +50,6 @@ export const InventoryManagement: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showActiveOnly, setShowActiveOnly] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -123,6 +123,13 @@ export const InventoryManagement: React.FC = () => {
     }
   };
 
+  const handleProductSave = (updatedProduct: Product) => {
+    setProducts(products.map(product => 
+      product.id === updatedProduct.id ? updatedProduct : product
+    ));
+    setEditingProduct(null);
+  };
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -183,13 +190,6 @@ export const InventoryManagement: React.FC = () => {
             >
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
-            </button>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 font-medium flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Product</span>
             </button>
           </div>
         </div>
@@ -388,31 +388,14 @@ export const InventoryManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Coming Soon Modal for Add/Edit */}
-      {(showAddForm || editingProduct) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="text-center">
-              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {showAddForm ? 'Add Product' : 'Edit Product'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Product management features are coming soon. For now, you can view and toggle product visibility.
-              </p>
-              <button
-                onClick={() => {
-                  setShowAddForm(false);
-                  setEditingProduct(null);
-                }}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Product Edit Modal */}
+      <ProductEditModal
+        product={editingProduct}
+        categories={categories}
+        isOpen={!!editingProduct}
+        onClose={() => setEditingProduct(null)}
+        onSave={handleProductSave}
+      />
     </div>
   );
 };
