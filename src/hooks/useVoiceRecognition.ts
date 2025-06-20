@@ -37,7 +37,8 @@ export const useVoiceRecognition = (language: 'en' | 'ta' = 'en'): VoiceRecognit
 
   // Check if speech recognition is supported
   const isSupported = typeof window !== 'undefined' && 
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) &&
+    window.location.protocol === 'https:';
 
   // Initialize speech recognition
   useEffect(() => {
@@ -92,6 +93,9 @@ export const useVoiceRecognition = (language: 'en' | 'ta' = 'en'): VoiceRecognit
           break;
         case 'not-allowed':
           setError('Microphone permission denied. Please allow microphone access.');
+          break;
+        case 'service-not-allowed':
+          setError('Speech service not allowed. Please ensure HTTPS and microphone permissions.');
           break;
         case 'network':
           setError('Network error. Please check your connection.');

@@ -14,7 +14,9 @@ export const useTextToSpeech = (): TextToSpeechHook => {
   const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null);
 
   // Check if speech synthesis is supported
-  const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const isSupported = typeof window !== 'undefined' && 
+    'speechSynthesis' in window && 
+    window.location.protocol === 'https:';
 
   useEffect(() => {
     if (!isSupported) return;
@@ -41,6 +43,16 @@ export const useTextToSpeech = (): TextToSpeechHook => {
   const speak = useCallback((text: string, language: 'en' | 'ta' = 'en') => {
     if (!isSupported) {
       console.warn('Text-to-speech is not supported in this browser.');
+      return;
+    }
+
+    // Check if voices are loaded
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      // Wait for voices to load
+      window.speechSynthesis.onvoiceschanged = () => {
+        speak(text, language);
+      };
       return;
     }
 

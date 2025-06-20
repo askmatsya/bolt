@@ -244,10 +244,18 @@ export const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
             <div className="flex items-center justify-center mb-2">
               <AlertCircle className="w-5 h-5 text-yellow-600 mr-2" />
               <span className="text-sm font-medium text-yellow-800">
-                {getText('notSupported')}
+                {window.location.protocol !== 'https:' 
+                  ? 'Voice features require HTTPS. Please use the deployed site.'
+                  : getText('notSupported')
+                }
               </span>
             </div>
-            <p className="text-xs text-yellow-700">{getText('tryChrome')}</p>
+            <p className="text-xs text-yellow-700">
+              {window.location.protocol !== 'https:' 
+                ? 'Voice APIs only work on secure (HTTPS) connections.'
+                : getText('tryChrome')
+              }
+            </p>
           </div>
         )}
 
