@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Globe, Heart, Award } from 'lucide-react';
 import { VoiceInterface } from './components/VoiceInterface';
 import { ConversationHistory } from './components/ConversationHistory';
