@@ -353,6 +353,7 @@ What specific item are you looking for?`,
         product={orderProduct}
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
+        language={language}
       />
     </div>
   );

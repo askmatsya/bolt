@@ -10,6 +10,8 @@ An AI-powered voice assistant that helps users discover authentic Indian ethnic 
 - **Order Management**: Simple ordering process with WhatsApp integration
 - **Admin Portal**: Manage orders and inventory
 - **Mobile-First Design**: Optimized for all devices
+- **WhatsApp Integration**: Real-time order confirmations via WhatsApp
+- **Multi-language Support**: English and Tamil support throughout
 
 ## 🚀 Quick Start
 
@@ -138,3 +140,49 @@ Built for Bolt.new hackathon with focus on:
 
 **Live Demo**: https://askmatsya.us
 **Admin Panel**: https://askmatsya.us/admin
+## 📱 WhatsApp Integration
+
+### Order Confirmation Flow
+1. Customer places order through voice or web interface
+2. Order gets saved to database with pending status
+3. WhatsApp confirmation sent to customer automatically
+4. Admin receives WhatsApp notification about new order
+5. Customer can track order status via WhatsApp
+
+### WhatsApp Features
+- **Automatic Confirmations**: Order details sent via WhatsApp
+- **Admin Notifications**: Real-time alerts for new orders
+- **Fallback Support**: If API fails, opens WhatsApp Web
+- **Multi-language**: Supports English and Tamil messages
+- **Order Tracking**: Customers can get updates via WhatsApp
+
+### Configuration
+
+To enable full WhatsApp API integration:
+
+1. **Option 1: UltraMsg API (Recommended)**
+   ```env
+   VITE_WHATSAPP_API_KEY=your_ultramsg_token
+   ```
+   - Sign up at [UltraMsg](https://ultramsg.com/)
+   - Get your API token
+   - Add to environment variables
+
+2. **Option 2: Twilio WhatsApp API**
+   ```env
+   VITE_WHATSAPP_API_KEY=your_twilio_auth_token
+   ```
+   - Set up Twilio WhatsApp sandbox
+   - Configure webhook endpoints
+   - Update API endpoints in `src/services/whatsapp.ts`
+
+3. **Option 3: WhatsApp Business API**
+   - Requires business verification
+   - Contact WhatsApp for API access
+   - Configure webhook endpoints
+
+### Fallback Mode
+If no API key is configured, the system automatically falls back to:
+- WhatsApp Web links (wa.me)
+- Opens WhatsApp app with pre-filled message
+- Still provides great user experience
