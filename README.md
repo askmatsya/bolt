@@ -158,17 +158,20 @@ Built for Bolt.new hackathon with focus on:
 
 ### Configuration
 
-To enable full WhatsApp API integration:
+To enable full WhatsApp Business API integration:
 
-1. **Option 1: UltraMsg API (Recommended)**
+1. **Facebook/Meta WhatsApp Business API (Current Setup)**
    ```env
-   VITE_WHATSAPP_API_KEY=your_ultramsg_token
+   VITE_WHATSAPP_API_KEY=your_facebook_access_token
+   VITE_WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+   VITE_WHATSAPP_BUSINESS_ACCOUNT_ID=your_business_account_id
    ```
-   - Sign up at [UltraMsg](https://ultramsg.com/)
-   - Get your API token
-   - Add to environment variables
+   - Set up WhatsApp Business API through Meta
+   - Get Phone Number ID from Meta Business Manager
+   - Configure webhook endpoints for message delivery
+   - Add environment variables to your deployment
 
-2. **Option 2: Twilio WhatsApp API**
+2. **Alternative: Twilio WhatsApp API**
    ```env
    VITE_WHATSAPP_API_KEY=your_twilio_auth_token
    ```
@@ -176,13 +179,23 @@ To enable full WhatsApp API integration:
    - Configure webhook endpoints
    - Update API endpoints in `src/services/whatsapp.ts`
 
-3. **Option 3: WhatsApp Business API**
-   - Requires business verification
-   - Contact WhatsApp for API access
-   - Configure webhook endpoints
+3. **Alternative: Third-party Services**
+   - UltraMsg, 360Dialog, or similar services
+   - Update API endpoints in WhatsApp service
+   - Configure according to service documentation
 
 ### Fallback Mode
-If no API key is configured, the system automatically falls back to:
+The system includes intelligent fallback mechanisms:
 - WhatsApp Web links (wa.me)
 - Opens WhatsApp app with pre-filled message
-- Still provides great user experience
+- Maintains order confirmation flow
+- Logs delivery attempts for tracking
+
+### Features
+- **Real-time Confirmations**: Instant order confirmations via WhatsApp
+- **Admin Notifications**: Automatic alerts for new orders
+- **Status Updates**: Send order progress updates to customers
+- **Multi-language**: Support for English and Tamil messages
+- **Delivery Tracking**: Log all WhatsApp message attempts
+- **Fallback Support**: Graceful degradation to WhatsApp Web
+- **Order Integration**: Seamless integration with order management

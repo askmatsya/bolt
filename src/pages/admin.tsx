@@ -7,11 +7,13 @@ import { CategoryManagement } from '../components/admin/CategoryManagement';
 import { ArtisanManagement } from '../components/admin/ArtisanManagement';
 import { BarChart3, Database, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import { populateSampleData } from '../services/sampleData';
+import { whatsappService } from '../services/whatsapp';
 
 export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'orders' | 'inventory' | 'categories' | 'artisans' | 'analytics'>('dashboard');
   const [isPopulating, setIsPopulating] = useState(false);
   const [populationResult, setPopulationResult] = useState<any>(null);
+  const [whatsappStatus, setWhatsappStatus] = useState<{ success: boolean; message: string } | null>(null);
 
   // Function to communicate cache refresh to main app
   const handleVoiceCacheRefresh = () => {
@@ -41,6 +43,16 @@ export default function AdminPage() {
       setIsPopulating(false);
     }
   };
+
+  const testWhatsAppConnection = async () => {
+    const result = await whatsappService.testConnection();
+    setWhatsappStatus(result);
+  };
+
+  // Test WhatsApp connection on component mount
+  useEffect(() => {
+    testWhatsAppConnection();
+  }, []);
 
   const renderContent = () => {
     switch (currentPage) {
@@ -107,6 +119,41 @@ export default function AdminPage() {
                   <span>
                     {isPopulating ? 'Adding Sample Data...' : 'Add Sample Data'}
                   </span>
+                </button>
+              </div>
+            </div>
+            
+            {/* WhatsApp Integration Status */}
+            <div className={`border rounded-lg p-4 ${
+              whatsappStatus?.success ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className={`text-sm font-semibold mb-2 ${
+                    whatsappStatus?.success ? 'text-green-800' : 'text-yellow-800'
+                  }`}>
+                    📱 WhatsApp Integration Status
+                  </h3>
+                  <p className={`text-sm ${
+                    whatsappStatus?.success ? 'text-green-700' : 'text-yellow-700'
+                  }`}>
+                    {whatsappStatus?.message || 'Testing connection...'}
+                  </p>
+                  {!whatsappStatus?.success && (
+                    <p className="text-xs text-yellow-600 mt-2">
+                      ⚠️ Using WhatsApp Web fallback. Orders will still work but will open WhatsApp in browser.
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={testWhatsAppConnection}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                    whatsappStatus?.success 
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
+                      : 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                  }`}
+                >
+                  Test Again
                 </button>
               </div>
             </div>

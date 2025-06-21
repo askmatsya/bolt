@@ -3,6 +3,7 @@ import {
   Eye, 
   Phone, 
   MessageCircle, 
+  Send,
   MapPin, 
   Clock,
   CheckCircle,
@@ -12,6 +13,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { whatsappService } from '../../services/whatsapp';
 
 interface Order {
   id: string;
@@ -46,6 +48,7 @@ export const OrderManagement: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [updating, setUpdating] = useState<string | null>(null);
+  const [sendingWhatsApp, setSendingWhatsApp] = useState<string | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -104,6 +107,32 @@ export const OrderManagement: React.FC = () => {
       alert('Failed to update order status. Please try again.');
     } finally {
       setUpdating(null);
+    }
+  };
+
+  const sendWhatsAppUpdate = async (order: Order) => {
+    if (!order.products?.name) return;
+    
+    setSendingWhatsApp(order.id);
+    
+    try {
+      const success = await whatsappService.sendOrderStatusUpdate(
+        order.customer_phone,
+        order.id,
+        order.status,
+        'en' // You could detect language from order data
+      );
+      
+      if (success) {
+        alert('WhatsApp status update sent successfully!');
+      } else {
+        alert('WhatsApp message sent via fallback method');
+      }
+    } catch (error) {
+      console.error('Failed to send WhatsApp update:', error);
+      alert('Failed to send WhatsApp update');
+    } finally {
+      setSendingWhatsApp(null);
     }
   };
 
@@ -348,6 +377,24 @@ export const OrderManagement: React.FC = () => {
                   <MessageCircle className="w-4 h-4 inline mr-2" />
                   WhatsApp
                 </a>
+                
+                <button
+                  onClick={() => sendWhatsAppUpdate(selectedOrder)}
+                  disabled={sendingWhatsApp === selectedOrder.id}
+                  className="flex-1 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded-lg p-3 text-center font-medium"
+                >
+                  {sendingWhatsApp === selectedOrder.id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent inline mr-2"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 inline mr-2" />
+                      Send Status Update
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Status Update */}
