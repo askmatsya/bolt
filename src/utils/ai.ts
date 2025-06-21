@@ -61,18 +61,59 @@ export class AIMatsya {
       
       // Fallback to static products if database fails
       try {
-        const { products: fallbackProducts } = await import('../data/products');
-        this.products = fallbackProducts;
+        const { sampleProducts } = await import('../data/products');
+        this.products = this.convertDbProductsToProducts(sampleProducts);
         this.lastFetch = now;
-        console.log(`⚠️ Using fallback products (${this.products.length} items)`);
+        console.log(`⚠️ Using sample data fallback (${this.products.length} items)`);
       } catch (fallbackError) {
         console.error('Failed to load fallback products:', fallbackError);
         // Use minimal fallback data if everything fails
-        this.products = [];
+        this.products = this.getMinimalFallbackProducts();
       }
       
       return this.products;
     }
+  }
+
+  // Convert database products to our Product interface format
+  private convertDbProductsToProducts(dbProducts: any[]): Product[] {
+    return dbProducts.map(dbProduct => ({
+      id: dbProduct.id,
+      name: dbProduct.name,
+      category: dbProduct.category || 'Uncategorized',
+      description: dbProduct.description,
+      culturalSignificance: dbProduct.cultural_significance || dbProduct.culturalSignificance || '',
+      price: dbProduct.price,
+      priceRange: dbProduct.price_range || dbProduct.priceRange || `$${dbProduct.price}`,
+      origin: dbProduct.origin,
+      artisan: dbProduct.artisan || undefined,
+      image: dbProduct.image_url || dbProduct.image || '',
+      tags: dbProduct.tags || [],
+      occasions: dbProduct.occasions || [],
+      materials: dbProduct.materials || [],
+      craftTime: dbProduct.craft_time || dbProduct.craftTime
+    }));
+  }
+
+  // Minimal fallback when everything fails
+  private getMinimalFallbackProducts(): Product[] {
+    return [
+      {
+        id: 'demo-1',
+        name: 'Traditional Handcraft Item',
+        category: 'Demo',
+        description: 'Sample product for demonstration purposes.',
+        culturalSignificance: 'Represents traditional Indian craftsmanship.',
+        price: 100,
+        priceRange: '$50 - $150',
+        origin: 'India',
+        image: 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg',
+        tags: ['traditional', 'handmade'],
+        occasions: ['gift', 'home decor'],
+        materials: ['natural materials'],
+        craftTime: '1 week'
+      }
+    ];
   }
 
   private getResponse(key: string, params?: any): string {

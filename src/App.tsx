@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Globe, Heart, Award } from 'lucide-react';
+import { Sparkles, Globe, Heart, Award, Settings } from 'lucide-react';
 import { isSupabaseConfigured } from './lib/supabase';
 import { VoiceInterface } from './components/VoiceInterface';
 import { ConversationHistory } from './components/ConversationHistory';
