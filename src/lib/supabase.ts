@@ -1,8 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../types/database'
 
 // Environment variables validation
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Check if Supabase is properly configured
+export const isSupabaseConfigured = () => {
+  return supabaseUrl && 
+         supabaseAnonKey && 
+         supabaseUrl !== 'https://your-project-id.supabase.co' &&
+         supabaseAnonKey !== 'your-anon-key-here'
+}
 
 // Declare supabase variable at top level
 let supabase: any;
