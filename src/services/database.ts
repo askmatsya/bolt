@@ -4,6 +4,11 @@ import type { Product, Category, Artisan, Order } from '../types';
 // Fallback data when Supabase is not configured
 import { sampleProducts } from '../data/products';
 
+// Generate a unique session ID for tracking user sessions
+export function generateSessionId(): string {
+  return crypto.randomUUID();
+}
+
 export const database = {
   async getAll<T>(table: string): Promise<T[]> {
     if (!isSupabaseConfigured()) {
