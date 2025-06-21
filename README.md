@@ -158,18 +158,27 @@ Built for Bolt.new hackathon with focus on:
 
 ### Configuration
 
-To enable full WhatsApp Business API integration:
+To enable full WhatsApp Business API integration with your provided credentials:
 
-1. **Facebook/Meta WhatsApp Business API (Current Setup)**
+1. **Facebook/Meta WhatsApp Business API (Configured Setup)**
    ```env
-   VITE_WHATSAPP_API_KEY=your_facebook_access_token
-   VITE_WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
-   VITE_WHATSAPP_BUSINESS_ACCOUNT_ID=your_business_account_id
+   VITE_WHATSAPP_API_KEY=EAA2ZBwPDJ5vQBO9OnKiaOzywBYB4v2lJZAtPRilknlVjM2fqBCq4uQQLTcaI4fRIrZAMT9jWbSLqDAcAqbDstbJSN8kyANO5PWZBRwAZCMGzsU0VETrDaTGWy6yz4e37p4Ge6ZBvRgdE2cysM9J7JmpKi8wDkECyhmYJs1A9VVKxALagZCWEHpMCvIuZAilgs7EPJ8GArvMdurki9ptoslP38wA1fzxbSvi7uSRF6hDM397j3SWZCnMmh9LEZD
+   VITE_WHATSAPP_PHONE_NUMBER_ID=618578974682253
+   VITE_WHATSAPP_BUSINESS_ACCOUNT_ID=1030404535901829
+   VITE_ADMIN_WHATSAPP=+919876543210
    ```
-   - Set up WhatsApp Business API through Meta
-   - Get Phone Number ID from Meta Business Manager
-   - Configure webhook endpoints for message delivery
-   - Add environment variables to your deployment
+   
+   **Your Configuration Status:**
+   - ✅ WhatsApp Business API Token: Provided
+   - ✅ Phone Number ID: 618578974682253
+   - ✅ Business Account ID: 1030404535901829
+   - ⚠️ Admin Phone: Set to default (+919876543210) - update as needed
+   
+   **Next Steps:**
+   - Add these environment variables to your `.env` file
+   - Verify phone number is approved for messaging in Meta Business Manager
+   - Test message sending through admin panel
+   - Configure webhook endpoints for delivery receipts (optional)
 
 2. **Alternative: Twilio WhatsApp API**
    ```env

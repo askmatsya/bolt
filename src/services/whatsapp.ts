@@ -27,14 +27,16 @@ class WhatsAppService {
 
   constructor() {
     this.apiKey = import.meta.env.VITE_WHATSAPP_API_KEY || '';
-    this.phoneNumberId = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID || '';
-    this.businessAccountId = import.meta.env.VITE_WHATSAPP_BUSINESS_ACCOUNT_ID || '';
+    this.phoneNumberId = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID || '618578974682253';
+    this.businessAccountId = import.meta.env.VITE_WHATSAPP_BUSINESS_ACCOUNT_ID || '1030404535901829';
     this.adminPhone = import.meta.env.VITE_ADMIN_WHATSAPP || '+919876543210';
     
     console.log('WhatsApp Service initialized:', {
       hasApiKey: !!this.apiKey,
       hasPhoneNumberId: !!this.phoneNumberId,
-      hasBusinessAccountId: !!this.businessAccountId
+      hasBusinessAccountId: !!this.businessAccountId,
+      phoneNumberId: this.phoneNumberId,
+      businessAccountId: this.businessAccountId
     });
   }
 
