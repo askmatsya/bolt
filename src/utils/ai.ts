@@ -57,12 +57,19 @@ export class AIMatsya {
       
       return this.products;
     } catch (error) {
-      console.error('Failed to load products from database:', error);
+      console.warn('Database not available, using fallback data:', error.message);
       
       // Fallback to static products if database fails
-      const { products: fallbackProducts } = await import('../data/products');
-      this.products = fallbackProducts;
-      console.log(`⚠️ Using fallback products (${this.products.length} items)`);
+      try {
+        const { products: fallbackProducts } = await import('../data/products');
+        this.products = fallbackProducts;
+        this.lastFetch = now;
+        console.log(`⚠️ Using fallback products (${this.products.length} items)`);
+      } catch (fallbackError) {
+        console.error('Failed to load fallback products:', fallbackError);
+        // Use minimal fallback data if everything fails
+        this.products = [];
+      }
       
       return this.products;
     }
