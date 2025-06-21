@@ -1,5 +1,5 @@
 import { Product, Recommendation } from '../types';
-import { productService } from '../services/database';
+import { productService } from '../services/admin';
 
 export class AIMatsya {
   private language: 'en' | 'ta' = 'en';
