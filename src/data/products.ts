@@ -1,32 +1,118 @@
-import { Product } from '../types';
+import type { Product } from '../types'
 
-// Fallback products array for when database is unavailable
-export const products: Product[] = [];
-
-export const categories = [
-  'All',
-  'Sarees',
-  'Jewelry', 
-  'Textiles',
-  'Art',
-  'Spices',
-  'Accessories',
-  'Home Decor'
-];
-
-export const occasions = [
-  'Wedding',
-  'Festival',
-  'Casual',
-  'Formal',
-  'Gift',
-  'Home Decor'
-];
-
-export const priceRanges = [
-  { label: 'Under $20', value: [0, 20] },
-  { label: '$20 - $100', value: [20, 100] },
-  { label: '$100 - $200', value: [100, 200] },
-  { label: '$200 - $400', value: [200, 400] },
-  { label: 'Above $400', value: [400, 2000] }
-];
+export const sampleProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Handwoven Kanchipuram Silk Saree',
+    category_id: 'cat-1',
+    description: 'Exquisite handwoven silk saree from Kanchipuram with traditional motifs and gold zari work.',
+    cultural_significance: 'Kanchipuram sarees are considered sacred and are often worn during weddings and religious ceremonies.',
+    price: 15000,
+    price_range: '₹10,000 - ₹25,000',
+    origin: 'Kanchipuram, Tamil Nadu',
+    artisan_id: 'artisan-1',
+    image_url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800',
+    tags: ['silk', 'handwoven', 'traditional', 'wedding'],
+    occasions: ['wedding', 'festival', 'ceremony'],
+    materials: ['silk', 'gold zari'],
+    craft_time: '2-3 months',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    name: 'Brass Tanjore Dancing Ganesha',
+    category_id: 'cat-2',
+    description: 'Beautiful brass statue of Lord Ganesha in dancing pose, handcrafted using traditional Tanjore techniques.',
+    cultural_significance: 'Dancing Ganesha represents the cosmic dance of creation and destruction, bringing prosperity and removing obstacles.',
+    price: 8500,
+    price_range: '₹5,000 - ₹15,000',
+    origin: 'Thanjavur, Tamil Nadu',
+    artisan_id: 'artisan-2',
+    image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+    tags: ['brass', 'ganesha', 'traditional', 'spiritual'],
+    occasions: ['festival', 'home decoration', 'puja'],
+    materials: ['brass'],
+    craft_time: '3-4 weeks',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    name: 'Madhubani Folk Art Painting',
+    category_id: 'cat-3',
+    description: 'Traditional Madhubani painting featuring nature motifs and mythological themes, hand-painted on handmade paper.',
+    cultural_significance: 'Madhubani art originates from Bihar and traditionally depicts Hindu deities, nature, and social events.',
+    price: 3500,
+    price_range: '₹2,000 - ₹8,000',
+    origin: 'Madhubani, Bihar',
+    artisan_id: 'artisan-3',
+    image_url: 'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=800',
+    tags: ['painting', 'folk art', 'traditional', 'decorative'],
+    occasions: ['home decoration', 'gift', 'cultural display'],
+    materials: ['natural pigments', 'handmade paper'],
+    craft_time: '1-2 weeks',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    name: 'Kashmiri Pashmina Shawl',
+    category_id: 'cat-4',
+    description: 'Luxurious hand-embroidered Pashmina shawl from Kashmir with intricate paisley patterns.',
+    cultural_significance: 'Pashmina represents the finest craftsmanship of Kashmir, traditionally worn by royalty and nobility.',
+    price: 12000,
+    price_range: '₹8,000 - ₹20,000',
+    origin: 'Kashmir, India',
+    artisan_id: 'artisan-4',
+    image_url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=800',
+    tags: ['pashmina', 'handwoven', 'embroidered', 'luxury'],
+    occasions: ['winter wear', 'formal events', 'gift'],
+    materials: ['pashmina wool'],
+    craft_time: '4-6 months',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '5',
+    name: 'Blue Pottery Decorative Vase',
+    category_id: 'cat-5',
+    description: 'Hand-painted blue pottery vase from Jaipur featuring traditional floral motifs and geometric patterns.',
+    cultural_significance: 'Blue pottery is a unique craft of Jaipur, originally brought from Persia and adapted to Indian aesthetics.',
+    price: 2800,
+    price_range: '₹1,500 - ₹5,000',
+    origin: 'Jaipur, Rajasthan',
+    artisan_id: 'artisan-5',
+    image_url: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800',
+    tags: ['pottery', 'blue pottery', 'decorative', 'handpainted'],
+    occasions: ['home decoration', 'gift', 'display'],
+    materials: ['clay', 'natural dyes'],
+    craft_time: '2-3 weeks',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '6',
+    name: 'Wooden Carved Elephant',
+    category_id: 'cat-6',
+    description: 'Intricately carved wooden elephant sculpture showcasing traditional Indian woodworking skills.',
+    cultural_significance: 'Elephants symbolize wisdom, strength, and good fortune in Indian culture and are considered sacred.',
+    price: 4200,
+    price_range: '₹2,500 - ₹8,000',
+    origin: 'Mysore, Karnataka',
+    artisan_id: 'artisan-6',
+    image_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800',
+    tags: ['wood carving', 'elephant', 'sculpture', 'traditional'],
+    occasions: ['home decoration', 'gift', 'spiritual'],
+    materials: ['rosewood'],
+    craft_time: '3-4 weeks',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }
+]

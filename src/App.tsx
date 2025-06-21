@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Globe, Heart, Award } from 'lucide-react';
+import { isSupabaseConfigured } from './lib/supabase';
 import { VoiceInterface } from './components/VoiceInterface';
 import { ConversationHistory } from './components/ConversationHistory';
 import { ProductModal } from './components/ProductModal';
@@ -24,6 +25,7 @@ function App() {
   const [orderProduct, setOrderProduct] = useState<Product | null>(null);
   const [language, setLanguage] = useState<'en' | 'ta'>('en');
   const [sessionId] = useState(() => generateSessionId());
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const [ai] = useState(() => new AIMatsya());
   const { speak, isSpeaking, stop: stopSpeaking } = useTextToSpeech();
@@ -31,10 +33,16 @@ function App() {
   // Function to refresh AI product cache
   const refreshVoiceSearchCache = useCallback(async () => {
     try {
+      // Check if Supabase is configured
+      if (!isSupabaseConfigured()) {
+        setConnectionError('Supabase not configured. Using sample data for demo.');
+      }
+      
       await ai.refreshProducts();
       console.log('Voice search cache refreshed with latest products');
     } catch (error) {
       console.error('Failed to refresh voice search cache:', error);
+      setConnectionError('Failed to load products. Using sample data for demo.');
     }
   }, [ai]);
   // Update voice state based on TTS
@@ -221,6 +229,21 @@ What specific item are you looking for?`,
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Connection Status Banner */}
+        {connectionError && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <Settings className="w-5 h-5 text-amber-600" />
+              <p className="text-amber-800 text-sm">
+                <strong>Demo Mode:</strong> {connectionError} 
+                <a href="/SETUP_INSTRUCTIONS.md" className="text-amber-600 underline ml-1">
+                  View setup instructions
+                </a>
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Quick Admin Access for Testing */}
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
